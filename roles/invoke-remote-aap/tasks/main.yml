@@ -1,0 +1,31 @@
+- name: Get job templates from API
+  ansible.builtin.uri:
+    url: "{{ ansible_remote_host }}/api/v2/job_templates/"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+    user: "{{ansible_remote_user }}"
+    password: "{{ ansible_remote_password }}"
+    force_basic_auth: yes
+    return_content: yes
+  register: response
+
+- name: Extract Job Template ID for Job Template
+  ansible.builtin.set_fact:
+    job_template_id: "{{ response.json.results | selectattr('name', 'equalto', job_template_name) | map(attribute='id') | first }}"
+
+- name: Debug the extracted Job Template ID
+  ansible.builtin.debug:
+    msg: "The Job Template ID for {{ job_template_name }} is {{ job_template_id }}"
+
+- name: Run the Job Template
+  ansible.builtin.uri:
+    url: "{{ ansible_remote_host }}/api/v2/job_templates/{{ job_template_id }}/launch/"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    user: "{{ansible_remote_user }}"
+    password: "{{ ansible_remote_password }}"
+    force_basic_auth: yes
+    return_content: yes
+  register: launch_response

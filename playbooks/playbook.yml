@@ -1,4 +1,5 @@
 ---
+# Simple task to initiate from a remote AAP instance
 - name: Run debug task
   hosts: localhost
   tasks:
